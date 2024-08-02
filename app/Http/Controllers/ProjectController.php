@@ -31,7 +31,7 @@ class ProjectController extends Controller
         $validatedData = $request->validate([
             'name' => 'required',
             'description' => 'nullable',
-            'start_date' => 'nullble|date',
+            'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
         ]);
         Project::create($validatedData);
