@@ -10,10 +10,18 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = Task::with('project')->get();
-        return view('tasks.index', compact('task'));
+        $query=Task::query();
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->input('project_id'));
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        $tasks = $query->with('project')->get();
+        $projects = Project::all();
+        return view('tasks.index', compact('task', 'projects'));
     }
 
     /**
@@ -30,13 +38,13 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedDate = $request->validate([
+        $request->validate([
             'project_id' => 'required|exists:projects,id',
             'title' => 'required',
             'description' => 'nullable',
             'status' => 'required|in:pending,completed',
         ]);
-        Task::create($validatedDate);
+        Task::create($request->all());
         return redirect()->route('tasks.index');
     }
 
@@ -45,6 +53,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        $task->load('project');
         return view('tasks.show', compact('task'));
     }
 
@@ -62,13 +71,13 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'project_id' => 'required|exists:projects,id',
             'title' => 'required',
             'description' => 'nullable',
             'status' => 'required|in:pending,completed',
         ]);
-        $task->update($validatedData);
+        $task->update($request->all());
         return redirect()->route('task.index');
     }
 

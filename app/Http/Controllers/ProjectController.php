@@ -29,13 +29,13 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required',
+            'name' => 'required|string',
             'description' => 'nullable',
             'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
         Project::create($validatedData);
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.index')->with('success', 'Projet cree avec succes.');
     }
 
     /**
@@ -60,13 +60,13 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $validatedData=$request->validate([
-            'name' => 'required',
-            'description' => 'nullable',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
             'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
         $project->update($validatedData);
-        return redirect()->route('project.index');
+        return redirect()->route('project.index')->with('success', 'Projet mis a jour avec succes.');
     }
 
     /**
